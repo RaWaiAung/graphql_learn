@@ -1,6 +1,6 @@
 // import { GraphqlServer } from "graphql-yoga";
 import { GraphQLServer } from "graphql-yoga";
-import { randomBytes, randomUUID } from "crypto";
+import { randomBytes } from "crypto";
 const users = [
   {
     id: "1",
@@ -24,7 +24,7 @@ const posts = [
     id: "10",
     title: "Learn graphql",
     body: "lorem",
-    published: false,
+    published: true,
     author: "1",
   },
   {
@@ -81,6 +81,7 @@ const typeDefs = `
     type Mutation {
       createUser(name: String!,email: String,age: Int): User!
       createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
+      createComment(text: String!,  author: ID! , post: ID!): Comment!
     }
 
     type User {
@@ -177,6 +178,27 @@ const resolvers = {
 
       posts.push(createdPost);
       return createdPost;
+    },
+    createComment(parent, args, ctx, info) {
+      const isAuthor = users.some((user) => (user.id = args.author));
+      const findPost = posts.some(
+        (post) => (post.id = args.post && post.published)
+      );
+
+      if (!isAuthor || !findPost) {
+        throw new Error("Unable to find user or post");
+      }
+
+      const newComment = {
+        id: randomBytes(4).toString("hex"),
+        text: args.text,
+        author: args.author,
+        post: args.post,
+      };
+
+      comments.push(newComment);
+
+      return newComment;
     },
   },
   Post: {
