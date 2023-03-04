@@ -80,6 +80,7 @@ const typeDefs = `
 
     type Mutation {
       createUser(name: String!,email: String,age: Int): User!
+      createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
     }
 
     type User {
@@ -160,6 +161,22 @@ const resolvers = {
 
       users.push(createdUser);
       return createdUser;
+    },
+    createPost(parent, args, ctx, info) {
+      const isUser = users.some((user) => user.id === args.author);
+      if (!isUser) {
+        throw new Error("User not found");
+      }
+      const createdPost = {
+        id: randomBytes(4).toString("hex"),
+        title: args.title,
+        body: args.body,
+        published: args.published,
+        author: args.author,
+      };
+
+      posts.push(createdPost);
+      return createdPost;
     },
   },
   Post: {
