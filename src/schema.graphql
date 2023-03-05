@@ -12,6 +12,10 @@ type Mutation {
   createComment(data: CreateCommentInput!): Comment!
 }
 
+type Subscription {
+  comment: Comment!
+}
+
 input CreateUserInput {
   name: String!
   email: String
